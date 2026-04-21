@@ -6,7 +6,7 @@
 
 <title>Reward Ads</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
 
 <style>
 
@@ -18,7 +18,7 @@ font-family:Poppins;
 }
 
 body{
-background:linear-gradient(145deg,#070013,#220042);
+background:linear-gradient(160deg,#050010,#1a0036);
 color:white;
 }
 
@@ -28,51 +28,68 @@ margin:auto;
 padding:15px;
 }
 
-.logo{
+/* Header */
+
+.header{
 text-align:center;
+margin-bottom:15px;
+}
+
+.logo{
 font-size:22px;
 font-weight:600;
-margin-bottom:10px;
 }
 
-.connected{
+.status{
 font-size:12px;
-color:#00ffc3;
+color:#00ffc8;
 }
+
+/* Card */
 
 .card{
-background:#180032;
-padding:16px;
+background:#13002a;
+padding:18px;
 border-radius:18px;
 margin-top:15px;
-box-shadow:0 0 20px rgba(120,0,255,0.25);
+box-shadow:0 0 25px rgba(128,0,255,.25);
 }
 
-.loginBtn{
-background:white;
-color:black;
-display:flex;
-align-items:center;
-justify-content:center;
-gap:10px;
-}
+/* Topbar */
 
 .topbar{
 display:flex;
 justify-content:space-between;
-background:#140028;
-padding:14px;
-border-radius:14px;
-margin-bottom:15px;
+margin-bottom:10px;
 }
 
-.banner{
-background:#220044;
-border-radius:16px;
-overflow:hidden;
-margin-top:15px;
+.small{
+font-size:12px;
+opacity:.7;
+}
+
+/* Button */
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:14px;
+background:linear-gradient(90deg,#7b00ff,#d100ff);
+color:white;
+font-weight:600;
 cursor:pointer;
-transition:.3s;
+}
+
+/* Banner */
+
+.banner{
+margin-top:14px;
+border-radius:14px;
+overflow:hidden;
+background:#220044;
+cursor:pointer;
+transition:.2s;
 }
 
 .banner:hover{
@@ -87,56 +104,36 @@ object-fit:cover;
 
 .banner-text{
 padding:10px;
+font-size:14px;
 }
+
+/* Error */
 
 .error{
 position:fixed;
 bottom:20px;
 left:50%;
 transform:translateX(-50%);
-background:#ff0066;
+background:#ff0055;
 padding:12px 20px;
 border-radius:10px;
 display:none;
-z-index:100;
 }
 
-.terms{
-display:flex;
-align-items:center;
-gap:8px;
-margin-top:10px;
-}
+/* Loading */
 
-.popup{
+.loading{
 position:fixed;
 top:0;
+bottom:0;
 left:0;
 right:0;
-bottom:0;
-background:rgba(0,0,0,.7);
-display:none;
+background:#050010;
+display:flex;
 align-items:center;
 justify-content:center;
-}
-
-.popup-box{
-background:#16002e;
-padding:20px;
-border-radius:20px;
-width:90%;
-max-width:400px;
-}
-
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:12px;
-margin-top:10px;
-cursor:pointer;
-background:linear-gradient(90deg,#7b00ff,#d100ff);
-color:white;
+font-size:18px;
+z-index:100;
 }
 
 </style>
@@ -145,38 +142,41 @@ color:white;
 
 <body>
 
+<div class="loading" id="loading">
+Loading...
+</div>
+
 <div class="container">
 
-<div class="logo">
-Reward Ads
-<div class="connected" id="status">Connecting...</div>
+<div class="header">
+<div class="logo">Reward Ads</div>
+<div class="status">Secure Connection</div>
 </div>
 
 <div id="login" class="card">
 
-<div class="terms">
-<input type="checkbox" id="terms">
-<div onclick="showTerms()">Terms & Conditions</div>
-</div>
-
-<button class="loginBtn" onclick="login()">
-Continue with Google
+<button onclick="login()">
+Continue With Google
 </button>
 
 </div>
 
-
 <div id="dashboard" style="display:none">
 
+<div class="card">
+
 <div class="topbar">
+
 <div>
-Email
+<div class="small">Email</div>
 <div id="email"></div>
 </div>
 
 <div>
-Points
+<div class="small">Points</div>
 <div id="points">0</div>
+</div>
+
 </div>
 
 </div>
@@ -185,7 +185,7 @@ Points
 
 <div class="banner" onclick="clickAd('ad1','https://example.com')">
 <img src="/image1.png">
-<div class="banner-text">Gaming Website</div>
+<div class="banner-text">Gaming Offer</div>
 </div>
 
 <div class="banner" onclick="clickAd('ad2','https://example.com')">
@@ -204,148 +204,186 @@ Points
 
 </div>
 
-<div class="popup" id="termsPopup">
-<div class="popup-box">
-<h3>Terms</h3>
-<p style="font-size:13px;margin-top:10px">
-Max 100 points daily<br>
-Max 5 clicks per banner<br>
-No abuse allowed<br>
-Points reset daily
-</p>
-<button onclick="closeTerms()">Back</button>
-</div>
-</div>
-
 <div class="error" id="error"></div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+
 import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+
 import { getAuth, GoogleAuthProvider, signInWithPopup, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 
 const firebaseConfig = {
+
 apiKey: "AIzaSyBtni6L2njhzJ0yNIP_D66-TOpOkZDCC-8",
+
 authDomain: "rewardads-668b6.firebaseapp.com",
+
 projectId: "rewardads-668b6",
+
 storageBucket: "rewardads-668b6.firebasestorage.app",
+
 messagingSenderId: "868867716513",
+
 appId: "1:868867716513:web:f14225721d0e778ae007e0"
+
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getFirestore(app);
+
 const auth = getAuth(app);
 
-document.getElementById("status").innerText="Connected ✓"
-
 let user;
+
 let points=0;
+
 let clicks={};
 
-window.login = async function(){
+/* Auto Login */
 
-if(!document.getElementById("terms").checked){
-showError("Accept Terms First")
-return
+onAuthStateChanged(auth, async (u)=>{
+
+if(u){
+
+user=u;
+
+await loadUser();
+
 }
+
+document.getElementById("loading").style.display="none"
+
+})
+
+window.login=async()=>{
 
 try{
 
-const provider = new GoogleAuthProvider();
-const result = await signInWithPopup(auth, provider);
+const provider=new GoogleAuthProvider();
 
-user = result.user;
+const result=await signInWithPopup(auth,provider);
 
-loadUser();
+user=result.user;
+
+await loadUser();
 
 }catch(e){
+
 showError(e.message)
+
 }
 
 }
 
 async function loadUser(){
 
+document.getElementById("login").style.display="none"
+
+document.getElementById("dashboard").style.display="block"
+
 document.getElementById("email").innerText=user.email
 
 const ref=doc(db,"users",user.uid)
+
 const snap=await getDoc(ref)
 
 if(snap.exists()){
-points=snap.data().points || 0
-clicks=snap.data().clicks || {}
-}else{
-await setDoc(ref,{
-email:user.email,
-points:0,
-clicks:{},
-day:new Date().toDateString()
-})
-}
 
-document.getElementById("login").style.display="none"
-document.getElementById("dashboard").style.display="block"
+points=snap.data().points || 0
+
+clicks=snap.data().clicks || {}
+
+}else{
+
+await setDoc(ref,{
+
+email:user.email,
+
+points:0,
+
+clicks:{},
+
+day:new Date().toDateString()
+
+})
+
+}
 
 updateUI()
 
 }
 
-window.clickAd = async function(id,url){
-
-const ref=doc(db,"users",user.uid)
-const snap=await getDoc(ref)
-
-let data=snap.data()
+window.clickAd=async(id,url)=>{
 
 if(points>=100){
+
 showError("Daily limit reached")
+
 return
+
 }
 
 if(!clicks[id]) clicks[id]=0
 
 if(clicks[id]>=5){
+
 showError("Max reached")
+
 return
+
 }
 
 clicks[id]++
+
 points++
 
+const ref=doc(db,"users",user.uid)
+
 await setDoc(ref,{
+
 email:user.email,
+
 points:points,
+
 clicks:clicks,
+
 day:new Date().toDateString()
+
 })
 
 updateUI()
+
 window.open(url)
 
 }
 
 function updateUI(){
+
 document.getElementById("points").innerText=points
-}
 
-window.showTerms=function(){
-document.getElementById("termsPopup").style.display="flex"
-}
-
-window.closeTerms=function(){
-document.getElementById("termsPopup").style.display="none"
 }
 
 function showError(msg){
+
 let e=document.getElementById("error")
+
 e.innerText=msg
+
 e.style.display="block"
-setTimeout(()=>e.style.display="none",3000)
+
+setTimeout(()=>{
+
+e.style.display="none"
+
+},3000)
+
 }
 
 </script>
 
 </body>
+
 </html>
